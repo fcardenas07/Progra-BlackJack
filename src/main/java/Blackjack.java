@@ -40,7 +40,7 @@ public class Blackjack {
         }
 
         int jugada = preguntarJugada();
-        do {
+        while (jugada == 1) {
             manoJugador = pedirCarta(baraja, manoJugador);
             mostrarMano(manoJugador);
 
@@ -54,12 +54,27 @@ public class Blackjack {
                 return;
             }
             jugada = preguntarJugada();
-        } while (jugada == 1);
+        }
+
+
+        while (sumaManoDealer <= 16) {
+            manoDealer = pedirCarta(baraja, manoDealer);
+            mostrarMano(manoDealer);
+            manoDealerSinPinta = quitarPintaACartas(manoDealer);
+            valoresManoDealer = obtenerValoresCartas(manoDealerSinPinta);
+            sumaManoDealer = sumarValoresMano(valoresManoDealer);
+
+            if (sePasoDe21(sumaManoDealer)) {
+                System.out.println("Ha ganado");
+                return;
+            }
+        }
 
         System.out.println("Resultados");
         bajarse(manoJugador, manoDealer);
 
-        if (verificarGanador(sumaManoJugador, sumaManoDealer)) {
+        boolean esGanador = verificarGanador(sumaManoJugador, sumaManoDealer);
+        if (esGanador) {
             System.out.println("Ha ganado");
         } else {
             System.out.println("Ha perdido");
