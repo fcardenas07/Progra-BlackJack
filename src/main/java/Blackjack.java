@@ -2,106 +2,95 @@ import java.util.*;
 
 public class Blackjack {
     public static void main(String[] args) {
-        jugar();
+        jugarBlackjack();
     }
 
-    public static void jugar() {
-        var baraja = crearBaraja();
-        barajar(baraja);
+    private static void jugarBlackjack() {
+        int volverAJugar;
+        do {
+            var baraja = crearBaraja();
+            barajar(baraja);
 
-        String[] manoJugador = crearMano();
-        String[] manoDealer = crearMano();
+            String[] manoJugador = crearMano();
+            String[] manoDealer = crearMano();
 
-        repartir(baraja, manoJugador);
-        repartir(baraja, manoDealer);
+            repartir(baraja, manoJugador);
+            repartir(baraja, manoDealer);
 
-        mostrarMano(manoJugador);
-        mostrarMano(manoDealer);
-
-        var manoJugadorSinPinta = quitarPintaACartas(manoJugador);
-        var valoresManoJugador = obtenerValoresCartas(manoJugadorSinPinta);
-        var manoDealerSinPinta = quitarPintaACartas(manoDealer);
-        var valoresManoDealer = obtenerValoresCartas(manoDealerSinPinta);
-
-        int sumaManoJugador = sumarValoresMano(valoresManoJugador);
-        int sumaManoDealer = sumarValoresMano(valoresManoDealer);
-
-        if (sePasoDe21(sumaManoJugador)) {
-            System.out.println("Ha perdido");
-            return;
-        }
-
-        if (esBlackjack(sumaManoJugador)) {
-            boolean esGanador = verificarGanador(sumaManoJugador, sumaManoDealer);
-            if (esGanador) {
-                System.out.println("Ha ganado");
-                return;
-            }
-        }
-
-        int jugada = preguntarJugada();
-        while (jugada == 1) {
-            manoJugador = pedirCarta(baraja, manoJugador);
             mostrarMano(manoJugador);
-
-            manoJugadorSinPinta = quitarPintaACartas(manoJugador);
-            valoresManoJugador = obtenerValoresCartas(manoJugadorSinPinta);
-            sumaManoJugador = sumarValoresMano(valoresManoJugador);
-
-            if (sePasoDe21(sumaManoJugador)) {
-                System.out.println(sumaManoJugador);
-                System.out.println("Ha perdido");
-                return;
-            }
-            jugada = preguntarJugada();
-        }
-
-
-        while (sumaManoDealer <= 16) {
-            manoDealer = pedirCarta(baraja, manoDealer);
             mostrarMano(manoDealer);
-            manoDealerSinPinta = quitarPintaACartas(manoDealer);
-            valoresManoDealer = obtenerValoresCartas(manoDealerSinPinta);
-            sumaManoDealer = sumarValoresMano(valoresManoDealer);
 
-            if (sePasoDe21(sumaManoDealer)) {
-                System.out.println("Ha ganado");
-                return;
+            int sumaManoJugador = sumarMano(manoJugador);
+
+            if (!esBlackjack(sumaManoJugador) && !sePasoDe21(sumaManoJugador)) {
+                manoJugador = turnoJugador(baraja, manoJugador);
             }
-        }
 
-        System.out.println("Resultados");
-        bajarse(manoJugador, manoDealer);
+            if (!sePasoDe21(sumarMano(manoJugador))) {
+                manoDealer = turnoDealer(baraja, manoDealer);
+            }
 
-        boolean esGanador = verificarGanador(sumaManoJugador, sumaManoDealer);
-        if (esGanador) {
-            System.out.println("Ha ganado");
-        } else {
-            System.out.println("Ha perdido");
-        }
+            bajarse(manoJugador, manoDealer);
+            volverAJugar = preguntarSiVuelveAJugar();
+
+        } while (volverAJugar == 1);
     }
 
-    public static boolean verificarGanador(int sumaManoJugador, int sumaManoDealer) {
-        if (esBlackjack(sumaManoDealer)) {
-            return false;
-        } else if (esBlackjack(sumaManoJugador) && !esBlackjack(sumaManoDealer)) {
-            return true;
-        } else return sumaManoJugador > sumaManoDealer;
-
-    }
-
-    public static int preguntarJugada() {
-        mostrarMenu();
+    private static int preguntarSiVuelveAJugar() {
+        mostrarMenuVolverAJugar();
         return ingresarOpcion();
     }
 
-    public static String[] pedirCarta(Stack<String> baraja, String[] mano) {
+    private static String[] turnoDealer(Stack<String> baraja, String[] manoDealer) {
+        while (sumarMano(manoDealer) <= 16) {
+            manoDealer = pedirCarta(baraja, manoDealer);
+        }
+        return manoDealer;
+    }
+
+    private static int sumarMano(String[] mano) {
+        var manoSinPinta = quitarPintaACartas(mano);
+        var valoresMano = obtenerValoresCartas(manoSinPinta);
+        return sumarValoresMano(valoresMano);
+    }
+
+    private static String[] turnoJugador(Stack<String> baraja, String[] manoJugador) {
+        int jugada = preguntarJugada();
+        int sumaManoJugador = sumarMano(manoJugador);
+
+        while (jugada == 1 && !sePasoDe21(sumaManoJugador)) {
+            manoJugador = pedirCarta(baraja, manoJugador);
+            mostrarMano(manoJugador);
+            sumaManoJugador = sumarMano(manoJugador);
+            if (!sePasoDe21(sumaManoJugador)) {
+                jugada = preguntarJugada();
+            }
+        }
+        return manoJugador;
+    }
+
+    private static boolean verificarGanador(int sumaManoJugador, int sumaManoDealer) {
+        if (sePasoDe21(sumaManoJugador) || esBlackjack(sumaManoDealer)) {
+            return false;
+        } else if (esBlackjack(sumaManoJugador) || sePasoDe21(sumaManoDealer)) {
+            return true;
+        } else {
+            return sumaManoJugador > sumaManoDealer;
+        }
+    }
+
+    private static int preguntarJugada() {
+        mostrarMenuJugada();
+        return ingresarOpcion();
+    }
+
+    private static String[] pedirCarta(Stack<String> baraja, String[] mano) {
         var manoArrayList = new ArrayList<>(Arrays.asList(mano));
         manoArrayList.add(baraja.pop());
         return manoArrayList.toArray(new String[0]);
     }
 
-    public static int ingresarOpcion() {
+    private static int ingresarOpcion() {
         Scanner teclado = new Scanner(System.in);
         boolean esNumero = false;
         int opcion = 0;
@@ -123,40 +112,58 @@ public class Blackjack {
         return opcion;
     }
 
-    public static void mostrarMenu() {
-        System.out.println("Menu. Seleccione una opcion: ");
+    private static void mostrarMenuJugada() {
+        System.out.println("----------------------------------");
+        System.out.println("Su turno. Seleccione una opcion: ");
         System.out.println("1-> Robar Carta");
         System.out.println("2-> Bajarse");
+        System.out.println("----------------------------------");
     }
 
-    public static void bajarse(String[] manoJugador, String[] manoDealer) {
-        var manoJugadorSinPinta = quitarPintaACartas(manoJugador);
-        var valoresManoJugador = obtenerValoresCartas(manoJugadorSinPinta);
-        var manoDealerSinPinta = quitarPintaACartas(manoDealer);
-        var valoresManoDealer = obtenerValoresCartas(manoDealerSinPinta);
+    private static void mostrarMenuVolverAJugar() {
+        System.out.println("----------------------------------");
+        System.out.println("Desea volver a jugar?. Seleccione una opcion: ");
+        System.out.println("1-> SI");
+        System.out.println("2-> NO");
+        System.out.println("----------------------------------");
 
-        int sumaManoJugador = sumarValoresMano(valoresManoJugador);
-        int sumaManoDealer = sumarValoresMano(valoresManoDealer);
+    }
 
+    private static void bajarse(String[] manoJugador, String[] manoDealer) {
+        int sumaManoJugador = sumarMano(manoJugador);
+        int sumaManoDealer = sumarMano(manoDealer);
+
+        boolean esJugadorGanador = verificarGanador(sumaManoJugador, sumaManoDealer);
+
+        mostrarResultados(manoJugador, manoDealer, sumaManoJugador, sumaManoDealer, esJugadorGanador);
+    }
+
+    private static void mostrarResultados(String[] manoJugador, String[] manoDealer, int sumaManoJugador, int sumaManoDealer, boolean esJugadorGanador) {
         System.out.print("Jugador = " + sumaManoJugador + " ");
         mostrarMano(manoJugador);
         System.out.print("Dealer = " + sumaManoDealer + " ");
         mostrarMano(manoDealer);
+
+        if (esJugadorGanador) {
+            System.out.println("Ha Ganado!");
+        } else {
+            System.out.println("Ha Perdido!");
+        }
     }
 
-    public static boolean sePasoDe21(int mano) {
+    private static boolean sePasoDe21(int mano) {
         return mano > 21;
     }
 
-    public static Boolean esBlackjack(int mano) {
+    private static Boolean esBlackjack(int mano) {
         return mano == 21;
     }
 
-    public static void barajar(Stack<String> baraja) {
+    private static void barajar(Stack<String> baraja) {
         Collections.shuffle(baraja);
     }
 
-    public static int sumarValoresMano(List<Integer> mano) {
+    private static int sumarValoresMano(List<Integer> mano) {
         int suma = 0;
         for (var valor : mano) {
             suma += valor;
@@ -164,7 +171,7 @@ public class Blackjack {
         return suma;
     }
 
-    public static ArrayList<String> quitarPintaACartas(String[] mano) {
+    private static ArrayList<String> quitarPintaACartas(String[] mano) {
         var cartasSinPinta = new ArrayList<String>();
         for (var carta : mano) {
             var valoresCarta = carta.split(" ");
@@ -173,8 +180,7 @@ public class Blackjack {
         return cartasSinPinta;
     }
 
-    public static List<Integer> obtenerValoresCartas(List<String> mano) {
-
+    private static List<Integer> obtenerValoresCartas(List<String> mano) {
         var valoresCartas = new ArrayList<Integer>();
         var mapa = crearMapa();
 
@@ -185,8 +191,7 @@ public class Blackjack {
         return valoresCartas;
     }
 
-    public static HashMap<String, Integer> crearMapa() {
-
+    private static HashMap<String, Integer> crearMapa() {
         var cartas = List.of("AS", "DOS", "TRES", "CUATRO", "CINCO",
                 "SEIS", "SIETE", "OCHO", "NUEVE", "DIEZ", "JOTA", "QUINA", "KAISER");
         var mapa = new HashMap<String, Integer>();
@@ -198,21 +203,21 @@ public class Blackjack {
         return mapa;
     }
 
-    public static void mostrarMano(String[] mano) {
+    private static void mostrarMano(String[] mano) {
         System.out.println(Arrays.toString(mano));
     }
 
-    public static void repartir(Stack<String> baraja, String[] mano) {
+    private static void repartir(Stack<String> baraja, String[] mano) {
         for (int i = 0; i < mano.length; i++) {
             mano[i] = baraja.pop();
         }
     }
 
-    public static String[] crearMano() {
+    private static String[] crearMano() {
         return new String[2];
     }
 
-    public static Stack<String> crearBaraja() {
+    private static Stack<String> crearBaraja() {
         String[] pintas = new String[]{"CORAZON", "DIAMANTE", "TREBOL", "PICA"};
         String[] numerosCartas = new String[]{"AS", "DOS", "TRES", "CUATRO", "CINCO",
                 "SEIS", "SIETE", "OCHO", "NUEVE", "DIEZ", "JOTA", "QUINA", "KAISER"};
