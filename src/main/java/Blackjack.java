@@ -21,7 +21,7 @@ public class Blackjack {
 
             int sumaManoJugador = sumarMano(manoJugador);
 
-            if (!esBlackjack(sumaManoJugador) && !sePasoDe21(sumaManoJugador)) {
+            if (!esBlackjack(sumaManoJugador)) {
                 manoJugador = turnoJugador(baraja, manoJugador);
             }
 
@@ -78,7 +78,7 @@ public class Blackjack {
             manoJugador = pedirCarta(baraja, manoJugador);
             mostrarMano(manoJugador);
             sumaManoJugador = sumarMano(manoJugador);
-            if (!sePasoDe21(sumaManoJugador)) {
+            if (!sePasoDe21(sumaManoJugador) && !esBlackjack(sumaManoJugador)) {
                 jugada = preguntarJugada();
             }
         }
