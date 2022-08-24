@@ -56,7 +56,6 @@ public class Blackjack {
         mostrarMenuVolverAJugar();
         return ingresarOpcion();
     }
-
     private static String[] turnoDealer(Stack<String> baraja, String[] manoDealer) {
         while (sumarMano(manoDealer) <= 16) {
             manoDealer = pedirCarta(baraja, manoDealer);
@@ -78,8 +77,12 @@ public class Blackjack {
             manoJugador = pedirCarta(baraja, manoJugador);
             mostrarMano(manoJugador);
             sumaManoJugador = sumarMano(manoJugador);
+
             if (!sePasoDe21(sumaManoJugador) && !esBlackjack(sumaManoJugador)) {
                 jugada = preguntarJugada();
+            }
+            if (esBlackjack(sumaManoJugador)) {
+                jugada = 0;
             }
         }
         return manoJugador;
@@ -129,19 +132,19 @@ public class Blackjack {
     }
 
     private static void mostrarMenuJugada() {
-        System.out.println("----------------------------------");
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println("Su turno. Seleccione una opcion: ");
         System.out.println("1-> Robar Carta");
         System.out.println("2-> Bajarse");
-        System.out.println("----------------------------------");
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 
     private static void mostrarMenuVolverAJugar() {
-        System.out.println("----------------------------------");
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         System.out.println("Desea volver a jugar?. Seleccione una opcion: ");
         System.out.println("1-> SI");
         System.out.println("2-> NO");
-        System.out.println("----------------------------------");
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
     }
 
@@ -154,10 +157,8 @@ public class Blackjack {
     }
 
     private static void mostrarResultados(String[] manoJugador, String[] manoDealer, int sumaManoDealer, boolean esJugadorGanador) {
-
         mostrarManos(manoJugador, manoDealer, sumaManoDealer);
         mostrarMensaje(esJugadorGanador);
-
     }
 
     private static void mostrarMensaje(boolean esJugadorGanador) {
@@ -204,7 +205,6 @@ public class Blackjack {
         for (var carta : mano) {
             valoresCartas.add(mapa.get(carta));
         }
-
         return valoresCartas;
     }
 
