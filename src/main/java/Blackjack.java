@@ -17,10 +17,9 @@ public class Blackjack {
             repartir(baraja, manoJugador);
             repartir(baraja, manoDealer);
 
-            mostrarMano(manoJugador);
-            mostrarMano(manoDealer);
-
             int sumaManoJugador = sumarMano(manoJugador);
+
+            mostrarManos(manoJugador, manoDealer, 0);
 
             if (!esBlackjack(sumaManoJugador) && !sePasoDe21(sumaManoJugador)) {
                 manoJugador = turnoJugador(baraja, manoJugador);
@@ -34,6 +33,23 @@ public class Blackjack {
             volverAJugar = preguntarSiVuelveAJugar();
 
         } while (volverAJugar == 1);
+    }
+
+    private static void mostrarManos(String[] manoJugador, String[] manoDealer, int numeroJugada) {
+        System.out.print("Jugador = " + sumarMano(manoJugador) + "; ");
+        mostrarMano(manoJugador);
+
+        if (numeroJugada == 0) {
+            System.out.print("Dealer = ");
+            mostrarMano(ocultarManoDealer(manoDealer));
+        } else {
+            System.out.print("Dealer = " + sumarMano(manoDealer) + "; ");
+            mostrarMano(manoDealer);
+        }
+    }
+
+    private static String[] ocultarManoDealer(String[] manoDealer) {
+        return new String[]{"**************", manoDealer[1]};
     }
 
     private static int preguntarSiVuelveAJugar() {
@@ -132,18 +148,19 @@ public class Blackjack {
     private static void bajarse(String[] manoJugador, String[] manoDealer) {
         int sumaManoJugador = sumarMano(manoJugador);
         int sumaManoDealer = sumarMano(manoDealer);
-
         boolean esJugadorGanador = verificarGanador(sumaManoJugador, sumaManoDealer);
 
-        mostrarResultados(manoJugador, manoDealer, sumaManoJugador, sumaManoDealer, esJugadorGanador);
+        mostrarResultados(manoJugador, manoDealer, sumaManoDealer, esJugadorGanador);
     }
 
-    private static void mostrarResultados(String[] manoJugador, String[] manoDealer, int sumaManoJugador, int sumaManoDealer, boolean esJugadorGanador) {
-        System.out.print("Jugador = " + sumaManoJugador + " ");
-        mostrarMano(manoJugador);
-        System.out.print("Dealer = " + sumaManoDealer + " ");
-        mostrarMano(manoDealer);
+    private static void mostrarResultados(String[] manoJugador, String[] manoDealer, int sumaManoDealer, boolean esJugadorGanador) {
 
+        mostrarManos(manoJugador, manoDealer, sumaManoDealer);
+        mostrarMensaje(esJugadorGanador);
+
+    }
+
+    private static void mostrarMensaje(boolean esJugadorGanador) {
         if (esJugadorGanador) {
             System.out.println("Ha Ganado!");
         } else {
